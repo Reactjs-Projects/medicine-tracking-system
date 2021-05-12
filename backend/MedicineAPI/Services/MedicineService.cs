@@ -15,16 +15,18 @@ namespace MedicineAPI.Services
             collection = dataStore.GetCollection<Medicine>("medicines");
         }
 
-        public bool AddMedicine(Medicine medicine)
+        public bool AddMedicine(Medicine medicine, out string id)
         {
+            medicine.Id = Guid.NewGuid().ToString();
+            id = medicine.Id;
             return collection.InsertOne(medicine);
         }
 
-        public Medicine GetMedicine(string name)
+        public Medicine GetMedicine(string id)
         {
             Medicine medicine = collection
                             .AsQueryable()
-                            .Where(item => item.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                            .Where(medicine => medicine.Id.Equals(id, StringComparison.OrdinalIgnoreCase))
                             .FirstOrDefault();
             return medicine;
         }
@@ -37,14 +39,14 @@ namespace MedicineAPI.Services
             return listOfMedicines;
         }
 
-        public bool UpdateMedicineNotes(string name, string note)
+        public bool UpdateMedicineNotes(string id, string note)
         {
-            Medicine medicine = GetMedicine(name);
+            Medicine medicine = GetMedicine(id);
             if (medicine != null)
             {
                 medicine.Notes = note;
                 return collection.UpdateOne(
-                    item => item.Name.Equals(medicine.Name, StringComparison.OrdinalIgnoreCase),
+                    item => item.Id.Equals(id, StringComparison.OrdinalIgnoreCase),
                     medicine);
             }
             return false;

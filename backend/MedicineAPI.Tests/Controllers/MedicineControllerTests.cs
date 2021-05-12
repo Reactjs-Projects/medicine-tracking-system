@@ -3,7 +3,7 @@ using Xunit;
 
 namespace MedicineAPI.Tests
 {
-    public class UnitTest1
+    public class MedicineControllerTests
     {
         [Fact]
         public void Test1()

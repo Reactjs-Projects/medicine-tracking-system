@@ -52,6 +52,13 @@ select {
   border: 0;
 }
 
+input[type="search"] {
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  border: 2px solid #343434;
+}
+
 ul,
 ul li {
   list-style: none;

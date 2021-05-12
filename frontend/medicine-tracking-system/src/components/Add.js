@@ -6,6 +6,7 @@ class Add extends React.Component {
     super(props);
     this.state = {
       medicine: {
+        id: "",
         name: "",
         brand: "",
         price: 0.0,
@@ -14,7 +15,7 @@ class Add extends React.Component {
         notes: "",
       },
       isFormValid: true,
-      isFormSubmitted: false,
+      showSuccessOrFailureMsg: false,
       successMessage: "",
       errorMessage: "",
     };
@@ -22,6 +23,7 @@ class Add extends React.Component {
 
   resetMedicineState = () => {
     const medicine = {
+      id: "",
       name: "",
       brand: "",
       price: 0.0,
@@ -46,16 +48,15 @@ class Add extends React.Component {
         (new Date(medicine.expiryDate).getTime() - Date.now()) /
           (1000 * 3600 * 24)
       );
-      console.log(daysRemaining);
       if (daysRemaining < 15) {
         isFormValid = false;
-        errorMessage =
-          "Medicines with expiry date less than 15 couldn't be added.";
+        errorMessage = "Medicines with expiry date less than 15 couldn't be added.";
         this.setState({ errorMessage, isFormValid });
       } else if (daysRemaining < 30) {
         isFormValid = true;
         successMessage = "Warning: Medicine will expiry within 30 days.";
       } else {
+        isFormValid = true;
         successMessage = "Submitted successfully.";
       }
 
@@ -65,25 +66,28 @@ class Add extends React.Component {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(this.state.medicine),
         };
-        const response = await fetch(
+        await fetch(
           "https://localhost:5003/api/medicines/store",
           requestOptions
-        );
-        // .then((response) => {
-        //   if (response.status == 400) {
-        //     this.setState({
-        //       errorMessage: ""
-        //     })
-        //   }
-        // })
-        // .then((data) => {
-        //   console.log(`Success: ${data}`);
-        // });
+        ).then((response) => {
+          console.log(`response: ${response}`);
+          console.log(`response code: ${response.status}`);
+          console.log(`response.ok: ${response.ok}`);
+          if (!response.ok) {
+            this.setState({
+              showSuccessOrFailureMsg: true,
+              isFormValid: false,
+              errorMessage,
+            });
+          } else {
+            this.setState({
+              showSuccessOrFailureMsg: true,
+              isFormValid: true,
+              successMessage,
+            });
+          }
+        });
 
-        const data = await response.json();
-        console.log(data);
-
-        this.setState({ successMessage });
         this.resetMedicineState();
       }
     }
@@ -105,7 +109,7 @@ class Add extends React.Component {
 
     const nameRegex = /^[A-Za-z ]+$/;
     const priceRegex = /^[0-9]+(.[0-9]+)?$/;
-    const quantityRegex = /^[0-9]$/;
+    const quantityRegex = /^[0-9]+$/;
 
     if (!nameRegex.test(name)) {
       isFormValid = false;
@@ -121,7 +125,7 @@ class Add extends React.Component {
       errorMessage = "Quantity: Only numbers are allowed.";
     }
 
-    this.setState({ errorMessage, isFormValid, isFormSubmitted: true });
+    this.setState({ errorMessage, isFormValid, showSuccessOrFailureMsg: true });
     return isFormValid;
   };
 
@@ -231,7 +235,9 @@ class Add extends React.Component {
             </form>
             <div
               className={
-                this.state.isFormSubmitted ? "show-alert-box" : "hide-alert-box"
+                this.state.showSuccessOrFailureMsg
+                  ? "show-alert-box"
+                  : "hide-alert-box"
               }
             >
               <div
@@ -239,7 +245,7 @@ class Add extends React.Component {
                   this.state.isFormValid ? "alert-success" : "alert-failure"
                 }`}
               >
-                {this.state.isFormSubmitted && this.state.isFormValid
+                {this.state.showSuccessOrFailureMsg && this.state.isFormValid
                   ? this.state.successMessage
                   : this.state.errorMessage}
               </div>

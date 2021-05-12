@@ -6,6 +6,7 @@ class MedicineDetails extends React.Component {
     super(props);
     this.state = {
       medicine: {
+        id: "",
         name: "",
         brand: "",
         price: 0.0,
@@ -15,6 +16,8 @@ class MedicineDetails extends React.Component {
       },
       originalNote: "",
       isChanged: false,
+      isSuccess: false,
+      isFormSubmitted: false,
     };
   }
 
@@ -24,7 +27,7 @@ class MedicineDetails extends React.Component {
 
   getMedicine = async () => {
     const response = await fetch(
-      `https://localhost:5003/api/medicines/read/${this.props.match.params.name}`
+      `https://localhost:5003/api/medicines/read/${this.props.match.params.id}`
     );
     const data = await response.json();
     this.setState({ medicine: data, originalNote: data.notes });
@@ -34,13 +37,27 @@ class MedicineDetails extends React.Component {
     const requestOptions = {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.state.medicine),
+      body: JSON.stringify({
+        id: this.state.medicine.id,
+        notes: this.state.medicine.notes,
+      }),
     };
-    const url = `https://localhost:5003/api/medicines/store/${this.state.medicine.name}`;
-    console.log(`url: ${url}`);
-    const response = await fetch(url, requestOptions);
-    //const data = await response.json();
-    console.log(response);
+    const url = `https://localhost:5003/api/medicines/store/${this.state.medicine.id}`;
+    await fetch(url, requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          this.setState({
+            isSuccess: true,
+            isFormSubmitted: true,
+          });
+        }
+      })
+      .catch((error) => {
+        this.setState({
+          isSuccess: false,
+          isFormSubmitted: true,
+        });
+      });
   };
 
   handleSubmit = async (event) => {
@@ -172,6 +189,21 @@ class MedicineDetails extends React.Component {
                 </li>
               </ul>
             </form>
+            <div
+              className={
+                this.state.isFormSubmitted ? "show-alert-box" : "hide-alert-box"
+              }
+            >
+              <div
+                className={`alert ${
+                  this.state.isSuccess ? "alert-success" : "alert-failure" 
+                }`}
+              >
+                {this.state.isSuccess
+                  ? "Update successfully"
+                  : "Update failed!"}
+              </div>
+            </div>
           </div>
         </div>
       </section>

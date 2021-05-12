@@ -1,7 +1,9 @@
 using System;
+using System.Dynamic;
 using System.Net;
 using System.Threading.Tasks;
 using MedicineAPI.Domain;
+using MedicineAPI.Errors;
 using MedicineAPI.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -26,36 +28,48 @@ namespace MedicineAPI
             return new OkObjectResult(medicineService.GetMedicines());
         }
 
-        [HttpGet("read/{name}")]
-        public ObjectResult Get(string name)
+        [HttpGet("read/{id}")]
+        public ObjectResult Get(string id)
         {
-            var medicine = medicineService.GetMedicine(name);
+            var medicine = medicineService.GetMedicine(id);
             if (medicine == null)
-                return new NotFoundObjectResult("No data found.");
+                return new NotFoundObjectResult(new NotFoundError("Resource not found"));
             return new OkObjectResult(medicine);
         }
 
         [HttpPost("store")]
         public ObjectResult Post([FromBody] Medicine medicine)
         {
+            if (!ModelState.IsValid)
+            {
+                return new BadRequestObjectResult(ModelState);
+            }
+
             if (!IsMedicineValid(medicine))
             {
-                return new BadRequestObjectResult("Internal Server Error");
+                return new BadRequestObjectResult(new BadRequestError("Medicine with expiryDate less than 15 days couldn't be added."));
             }
-            bool isCreated = medicineService.AddMedicine(medicine);
-            return isCreated ? Created("", "{}") : new BadRequestObjectResult("Internal Server Error");
+            bool isCreated = medicineService.AddMedicine(medicine, out string id);
+            return isCreated
+                ? StatusCode(Convert.ToInt16(HttpStatusCode.Created), new { Id = id })
+                : new ObjectResult(new InternalServerError());
         }
 
-        [HttpPatch("store/{name}")]
-        public ObjectResult Update(string name, [FromBody] Medicine medicine)
+        [HttpPatch("store/{id}")]
+        public IActionResult PatchUpdate(string id, [FromBody] MedicinePatchRequest medicine)
         {
-            var _medicine = medicineService.GetMedicine(name);
+            if (!ModelState.IsValid)
+            {
+                return new BadRequestObjectResult(ModelState);
+            }
+
+            var _medicine = medicineService.GetMedicine(id);
             if (_medicine == null)
             {
-                return new BadRequestObjectResult($"Invalid medicine");
+                return new BadRequestObjectResult(new BadRequestError("Invalid medicine"));
             }
-            medicineService.UpdateMedicineNotes(name, medicine.Notes);
-            return new OkObjectResult("{}");
+            medicineService.UpdateMedicineNotes(id, medicine.Notes);
+            return new NoContentResult();
         }
 
         private bool IsMedicineValid(Medicine medicine)
