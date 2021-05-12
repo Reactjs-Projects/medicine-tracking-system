@@ -1,0 +1,58 @@
+{
+  "medicines": [
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a",
+      "name": "Benadryl Syrup",
+      "brand": "Benadryl Syrup",
+      "price": 45.0,
+      "quantity": 15,
+      "expiryDate": "2022-08-12T00:00:00",
+      "notes": "Used to treat cough."
+    },
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a0",
+      "name": "Limcee",
+      "brand": "Abbott Health Care Pvt Ltd",
+      "price": 95.0,
+      "quantity": 15,
+      "expiryDate": "2021-11-06T00:00:00",
+      "notes": "Limcee vitamin C 500mg"
+    },
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a1",
+      "name": "Zerodol-P",
+      "brand": "Ipca Laboratories Pvt Ltd",
+      "price": 100.0,
+      "quantity": 9,
+      "expiryDate": "2021-12-06T00:00:00",
+      "notes": ""
+    },
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a2",
+      "name": "Azithromicin",
+      "brand": "Cipla",
+      "price": 130.5,
+      "quantity": 40,
+      "expiryDate": "2022-01-23T00:00:00",
+      "notes": "Treats bacterial infection"
+    },
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a3",
+      "name": "Arshomrit",
+      "brand": "Ajit Ayuvedia",
+      "price": 150.0,
+      "quantity": 10,
+      "expiryDate": "2022-08-02T00:00:00",
+      "notes": ""
+    },
+    {
+      "id": "55bc3471-138d-4c4b-a04c-5e82da19ec2a4",
+      "name": "Duphalac soln",
+      "brand": "Solvay",
+      "price": 95.0,
+      "quantity": 40,
+      "expiryDate": "2021-05-30T00:00:00",
+      "notes": "Ease in motion"
+    }
+  ]
+}
